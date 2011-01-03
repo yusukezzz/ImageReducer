@@ -24,10 +24,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class ImageReducer extends Activity {
-    private final static String TEMP_DIR   = Environment.getExternalStorageDirectory().getAbsolutePath()
-                                                  + File.separator + "ImageReducer";
+    private final static String TEMP_DIR             = Environment.getExternalStorageDirectory().getAbsolutePath()
+                                                             + File.separator + "ImageReducer";
     // 長辺
-    private final static int    LONG_SIDE = 640;
+    private final static int    LONG_SIDE            = 640;
+    // 画質
+    private final static int    OUTPUT_IMAGE_QUALITY = 80;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,6 @@ public class ImageReducer extends Activity {
         ByteArrayOutputStream baos = null;
 
         // 画像だったら縮小
-        // TODO:PNG 対応
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
             try {
@@ -89,7 +90,7 @@ public class ImageReducer extends Activity {
                 // jpeg 出力
                 String file_path = TEMP_DIR + File.separator + file_name;
                 baos = new ByteArrayOutputStream();
-                resized.compress(CompressFormat.JPEG, 80, baos);
+                resized.compress(CompressFormat.JPEG, OUTPUT_IMAGE_QUALITY, baos);
                 baos.flush();
                 byte[] w = baos.toByteArray();
                 baos.close();
@@ -101,11 +102,11 @@ public class ImageReducer extends Activity {
                 fos.close();
 
                 // intent を投げてアプリケーション選択
-                Uri send_uri = Uri.fromFile(new File(file_path));
+                Uri resized_uri = Uri.fromFile(new File(file_path));
                 Intent i = new Intent();
                 i.setAction(Intent.ACTION_SEND);
                 i.setType("image/jpeg");
-                i.putExtra(Intent.EXTRA_STREAM, send_uri);
+                i.putExtra(Intent.EXTRA_STREAM, resized_uri);
                 startActivity(i);
             } catch (FileNotFoundException e) {
                 // InputStream 生成に失敗

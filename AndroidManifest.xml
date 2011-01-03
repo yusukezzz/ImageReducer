@@ -13,7 +13,8 @@
 			    
 			    <data android:mimeType="image/jpg" />
 			    <data android:mimeType="image/jpeg" />
-			</intent-filter>
+			<data android:mimeType="image/png"></data>
+</intent-filter>
         </activity>
 
 
