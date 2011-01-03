@@ -24,7 +24,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class ImageReducer extends Activity {
-    private final static String TEMPDIR   = Environment.getExternalStorageDirectory().getAbsolutePath()
+    private final static String TEMP_DIR   = Environment.getExternalStorageDirectory().getAbsolutePath()
                                                   + File.separator + "ImageReducer";
     // 長辺
     private final static int    LONG_SIDE = 640;
@@ -49,17 +49,17 @@ public class ImageReducer extends Activity {
                         MediaStore.Images.ImageColumns.DISPLAY_NAME, MediaStore.Images.ImageColumns.ORIENTATION },
                         null, null);
                 query.moveToFirst();
-                String filename = query.getString(0);
+                String file_name = query.getString(0);
                 int orientation = query.getInt(1);
 
                 // オリジナルを bitmap で取得
                 is = cr.openInputStream(uri);
-                Bitmap bmOrg = BitmapFactory.decodeStream(is);
+                Bitmap bm_org = BitmapFactory.decodeStream(is);
                 is.close();
 
                 // width と height の長さを取得
-                int width = bmOrg.getWidth();
-                int height = bmOrg.getHeight();
+                int width = bm_org.getWidth();
+                int height = bm_org.getHeight();
 
                 // 長辺を 640px に縮小したときの倍率を取得
                 float scale = (width >= height) ? ((float) LONG_SIDE) / width : ((float) LONG_SIDE) / height;
@@ -68,10 +68,10 @@ public class ImageReducer extends Activity {
                 matrix.postScale(scale, scale);
                 matrix.postRotate(orientation);
                 // リサイズ＆回転後の画像生成
-                Bitmap resized = Bitmap.createBitmap(bmOrg, 0, 0, width, height, matrix, true);
+                Bitmap resized = Bitmap.createBitmap(bm_org, 0, 0, width, height, matrix, true);
 
                 // jpeg 出力用ディレクトリ準備
-                File dir = new File(TEMPDIR);
+                File dir = new File(TEMP_DIR);
                 if (!dir.exists()) {
                     if (!dir.mkdirs()) {
                         throw new IOException("File.mkdirs() failed.");
@@ -87,7 +87,7 @@ public class ImageReducer extends Activity {
                 }
 
                 // jpeg 出力
-                String fileFullPath = TEMPDIR + File.separator + filename;
+                String file_path = TEMP_DIR + File.separator + file_name;
                 baos = new ByteArrayOutputStream();
                 resized.compress(CompressFormat.JPEG, 80, baos);
                 baos.flush();
@@ -95,13 +95,13 @@ public class ImageReducer extends Activity {
                 baos.close();
 
                 // ファイルとして保存
-                fos = new FileOutputStream(fileFullPath);
+                fos = new FileOutputStream(file_path);
                 fos.write(w, 0, w.length);
                 fos.flush();
                 fos.close();
 
                 // intent を投げてアプリケーション選択
-                Uri send_uri = Uri.fromFile(new File(fileFullPath));
+                Uri send_uri = Uri.fromFile(new File(file_path));
                 Intent i = new Intent();
                 i.setAction(Intent.ACTION_SEND);
                 i.setType("image/jpeg");
