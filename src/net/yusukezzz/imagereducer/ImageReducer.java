@@ -19,13 +19,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -80,13 +77,6 @@ public class ImageReducer extends Activity {
                 for (ResolveInfo rInfo : apps) {
                     // 表示する各アプリを設定
                     AppInfo data = new AppInfo();
-                    Context c = null;
-                    try {
-                        c = this.createPackageContext(rInfo.activityInfo.packageName, Context.CONTEXT_RESTRICTED);
-                    } catch (NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    Resources res = c.getResources();
                     data.setText(rInfo.loadLabel(pm).toString());
                     data.setPackageName(rInfo.activityInfo.packageName);
                     data.setClassName(rInfo.activityInfo.name);
@@ -143,7 +133,7 @@ public class ImageReducer extends Activity {
                 }
 
                 // jpeg 出力
-                String file_path = TEMP_DIR + File.separator + file_name;
+                String file_path = TEMP_DIR + File.separator + file_name.replace(' ', '_');
                 baos = new ByteArrayOutputStream();
                 resized.compress(CompressFormat.JPEG, OUTPUT_IMAGE_QUALITY, baos);
                 baos.flush();
